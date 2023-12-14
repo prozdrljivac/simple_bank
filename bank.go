@@ -1,12 +1,43 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"strconv"
 )
+
+const storageFile = "balance.txt"
+
+func getBalanceFromFile() (float64, error) {
+	data, err := os.ReadFile(storageFile)
+
+	if err != nil {
+		return 0, errors.New("could not find balance file")
+	}
+
+	balanceText := string(data)
+	balance, err := strconv.ParseFloat(balanceText, 64)
+
+	if err != nil {
+		return 0, errors.New("could not parse balance file")
+	}
+
+	return balance, nil
+}
+
+func writeBalanceToFile(balance float64) {
+	balanceText := fmt.Sprint(balance)
+	os.WriteFile(storageFile, []byte(balanceText), 644)
+}
 
 func main() {
 	var choice int
-	var balance float64 = 2000.00
+	balance, err := getBalanceFromFile()
+
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Println("Welcome to the Bank, what would you like to do?")
 	for {
@@ -26,6 +57,7 @@ func main() {
 			fmt.Scan(&deposit)
 			balance += deposit
 			fmt.Printf("Your balance is $%v\n", balance)
+			writeBalanceToFile(balance)
 		case 3:
 			var withdraw float64
 			fmt.Println("How much would you like to withdraw?")
@@ -35,6 +67,7 @@ func main() {
 			} else {
 				balance -= withdraw
 				fmt.Printf("Your balance is $%v\n", balance)
+				writeBalanceToFile(balance)
 			}
 		default:
 			fmt.Println("Thank you for using the Bank")
