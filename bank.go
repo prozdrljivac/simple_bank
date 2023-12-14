@@ -28,7 +28,7 @@ func getBalanceFromFile() (float64, error) {
 
 func writeBalanceToFile(balance float64) {
 	balanceText := fmt.Sprint(balance)
-	os.WriteFile(storageFile, []byte(balanceText), 644)
+	os.WriteFile(storageFile, []byte(balanceText), os.FileMode(0644))
 }
 
 func main() {
